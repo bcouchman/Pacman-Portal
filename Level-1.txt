@@ -1,0 +1,23 @@
+W:27 H:22 S:5
+wwwwwwwwwwwwwwwwwwwwwwwwwww
+w------------w------------w
+w-wwww-wwwww-w-wwwww-wwww-w
+w+wwww-wwwww-w-wwwww-wwww+w
+w-------------------------w
+w-wwww-w-wwwwwwwww-w-wwww-w
+w------w-----w-----w------w
+wwwwww-wwwww-w-wwwww-wwwwww
+     w-w     1     w-w     
+wwwwww-w wwww?wwww w-wwwwww
+      -  w 2 3 4 w  -      
+wwwwww-w wwwwwwwww w-wwwwww
+     w-w           w-w     
+wwwwww-w wwwwwwwww w-wwwwww
+w------------w------------w
+w-wwww-wwwww-w-wwwww-wwww-w
+w+---w-------p-------w---+w
+wwww-w-w-wwwwwwwww-w-w-wwww
+w------w-----w-----w------w
+w-wwwwwwwwww-w-wwwwwwwwww-w
+w-------------------------w
+wwwwwwwwwwwwwwwwwwwwwwwwwww
