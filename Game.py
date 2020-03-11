@@ -17,6 +17,9 @@ class Pacman(Sprite):
         self.nextmove = Vector()
         self.game = game
         self.screen = game.screen
+        self.score = 0
+        self.font = pg.font.SysFont("comicsansms", 36)
+        self.text = self.font.render("Score: 0", True, (0, 0, 0))
         self.image = [pg.image.load('pacman1.png'), pg.image.load('pacman2.png'), pg.image.load('pacman3.png'),
                       pg.image.load('pacman4.png')]
         self.image.append(pg.transform.rotate(self.image[0], 90))
@@ -52,6 +55,9 @@ class Pacman(Sprite):
         elif self.rect.x > self.game.MWidth * 30 - 29:
             self.rect.x -= self.game.MWidth * 30
             self.screen.blit(self.image[self.img + self.facing], self.rect)
+        text = "Score: " + str(self.score)
+        self.text = self.font.render(text, True, (0, 0, 0))
+        self.screen.blit(self.text, (100, 0))
 
     def move(self):
         if self.nextmove != Vector():
@@ -81,7 +87,8 @@ class Pacman(Sprite):
             self.frame = 0
             if self.img == 4:
                 self.img = 0
-        pg.sprite.spritecollide(self, self.game.food, True)
+        if 0 != len(pg.sprite.spritecollide(self, self.game.food, True)):
+            self.score += 1
         self.move()
         self.draw()
 
@@ -264,9 +271,11 @@ class Ghost(Sprite):
     def collide(self):
         if pg.sprite.collide_rect(self, self.game.player):
             if 0 == self.mode:  # should be 0 not 9
+                pg.display.set_caption('You lose!')
                 self.game.finished = True
             elif 1 != self.mode:
                 self.mode = 1
+                self.game.player.score += 200
 
     def afraid(self):
         self.mode = 50
@@ -430,6 +439,7 @@ class Cookie(Sprite):
 
     def update(self):
         if pg.sprite.collide_rect(self, self.game.player):
+            self.game.player.score += 50
             for g in self.game.ghosts:
                 g.afraid()
         self.draw()
@@ -481,6 +491,9 @@ class Game:
 
     def __init__(self):
         pg.init()
+        pg.mixer.init()
+        pg.mixer.music.load('sounds/Pac-Man-Theme-Song.mp3')
+        pg.mixer.music.play(-1, 0.0)
         self.bg_color = (40, 40, 40)  # dark grey
         self.finished: bool = False
         levelfile = open("level-1.txt")
@@ -543,17 +556,18 @@ class Game:
                     self.player.nextmove = movement[k] * 6  # self.SPEED
                     self.player.facingnext = facing[k]
                 elif k == K_z:
-                    if 1 == len(self.portals):
-                        if self.portals[0].decay == 1:
-                            return
-                    if 2 == len(self.portals):
-                        p = self.portals.pop(0)
-                        self.walls.add(Wall(self, p.rect.x, p.rect.y))
-                        p.kill()
-                    pg.mixer.Sound.play(self.portal_fire)
-                    self.portals.append(Portal(self, self.player.rect.x, self.player.rect.y,
-                                               len(self.portals), Vector(self.player.velocity.x,
-                                                                         self.player.velocity.y)))
+                    if self.player.velocity != Vector():
+                        if 1 == len(self.portals):
+                            if self.portals[0].decay == 1:
+                                return
+                        if 2 == len(self.portals):
+                            p = self.portals.pop(0)
+                            self.walls.add(Wall(self, p.rect.x, p.rect.y))
+                            p.kill()
+                        pg.mixer.Sound.play(self.portal_fire)
+                        self.portals.append(Portal(self, self.player.rect.x, self.player.rect.y,
+                                                   len(self.portals), Vector(self.player.velocity.x,
+                                                                             self.player.velocity.y)))
             elif e_type == QUIT:  # quit
                 self.finished = True
 
@@ -575,6 +589,15 @@ class Game:
                 pg.display.set_caption('You WIN!')
                 pg.display.update()
                 return
+        text = "Score: " + str(self.player.score)
+        self.player.text = self.player.font.render(text, True, (255, 255, 255))
+        self.screen.blit(self.player.text, (100, 0))
+        pg.display.update()
+        while self.finished:
+            for event in pg.event.get():
+                e_type = event.type
+                if e_type == pg.KEYDOWN:
+                    self.finished = False
 
 
 class DGhost(Sprite):
@@ -756,6 +779,7 @@ class Demo:
         self.rect = self.image.get_rect()
         self.rect.x = self.game.screen.get_width() / 2 - 400
         self.rect.y = 20
+        self
 
     def play(self):
         while self.hold:
